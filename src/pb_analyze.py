@@ -1,3 +1,45 @@
+#TODO: change name of varaibles for make it more clear and explicate the code
+
+import numpy as np
+
+def transition_count_(data):
+    matrix_global=[]
+    for i in range(0,len(data)):
+        matrix_global.append(analyse_row(data[i]))
+    return matrix_global
+
+def analyse_row(row):
+    matrix= np.zeros((16,16))
+    for i in range(0,len(row)-1):
+        index_row = ord(row[i])-97
+        index_col = ord(row[i+1])-97
+        matrix[index_row,index_col] += 1
+    return matrix
+
+def prorata_global(transition_matrix):
+    transition_ratio = []
+    for i in range(0,len(transition_matrix)):
+        transition_ratio.append(prorata_sequence(transition_matrix[i]))
+    return transition_ratio
+
+def prorata_sequence(transition_item):
+    result = np.zeros((3,3))
+    for i in range(0,len(transition_item)):
+        result[i] = prorata_row(transition_item[i])
+    return result
+    
+def prorata_row(row):
+    sum_row = row.sum()
+    result= np.zeros((3))
+    for i in range(0,len(row)):
+        if sum_row > 0 :
+            result[i]=row[i]/sum_row
+    return result
+
+
+
+#TODO : make this code in forms, check if this can work with a list of matrix
+
 from numpy  import array, shape, where, in1d
 import math
 import time
@@ -27,7 +69,7 @@ class InformationTheoryTool:
         values_x = set(data[x_index])
         # Print debug info
         if debug:
-            print('Entropy of')
+            print('Entropy of')  
             print(data[x_index])
         # For each random
         for value_x in values_x:
@@ -103,3 +145,5 @@ class InformationTheoryTool:
                 if debug:
                     print('(%d,%d) px:%f py:%f pxy:%f' % (value_x, value_y, px, py, pxy))
         return summation
+
+#TODO: write a code for calculate the expected error -> B(x,y) - Bx - By +1 / 2N where to B(x,y), Bx and By are the count of non zero in the variable x,y x&y ; and N the sample size
