@@ -1,149 +1,57 @@
 #TODO: change name of varaibles for make it more clear and explicate the code
 
 import numpy as np
+from scipy import stats
+import math
 
-def transition_count_(data):
-    matrix_global=[]
-    for i in range(0,len(data)):
-        matrix_global.append(analyse_row(data[i]))
-    return matrix_global
+def calculate_MI_global(frames_all):
+    seq_size = len(frames_all[:,0])
+    MI = np.zeros((seq_size,seq_size))
+    eeMI = np.zeros((seq_size,seq_size))
+    weight = 1 / seq_size
+    for i in range(0,len(frames_all)):
+        for j in range(i,len(frames_all)):
+            px = calculate_px(frames_all[i],weight)
+            py = calculate_px(frames_all[j],weight)
+            pxy = calculate_pxy(frames_all[i],frames_all[j],weight)
+            MI[i,j]=calulate_MI(px, py, pxy)
+            eeMI[i,j]=calculate_eeMI(px, py, pxy)
+            if i != j:
+                MI[j,i]=MI[i,j]
+                eeMI[j,i]=eeMI[i,j]
+    return MI, eeMI
 
-def analyse_row(row):
-    matrix= np.zeros((16,16))
-    for i in range(0,len(row)-1):
-        index_row = ord(row[i])-97
-        index_col = ord(row[i+1])-97
-        matrix[index_row,index_col] += 1
+def calculate_px(frame, weight):
+    matrix= np.zeros((16))
+    for i in range(0,len(frame)):
+        index_row = ord(frame[i])-97
+        matrix[index_row] += weight
     return matrix
 
-def prorata_global(transition_matrix):
-    transition_ratio = []
-    for i in range(0,len(transition_matrix)):
-        transition_ratio.append(prorata_sequence(transition_matrix[i]))
-    return transition_ratio
 
-def prorata_sequence(transition_item):
-    result = np.zeros((3,3))
-    for i in range(0,len(transition_item)):
-        result[i] = prorata_row(transition_item[i])
-    return result
-    
-def prorata_row(row):
-    sum_row = row.sum()
-    result= np.zeros((3))
-    for i in range(0,len(row)):
-        if sum_row > 0 :
-            result[i]=row[i]/sum_row
-    return result
+def calculate_pxy(frame_src, frame_target, weight):
+    matrix= np.zeros((16,16))
+    for i in range(0,len(frame_src)):
+        index_row = ord(frame_src[i])-97
+        index_col = ord(frame_target[i])-97
+        matrix[index_row,index_col] += weight
+    return matrix
 
 
 
-#TODO : make this code in forms, check if this can work with a list of matrix
+def calulate_MI(px, py, pxy):
+    size = len(px)
+    MI = 0
+    for i in range(0,size):
+        for j in range(0,size):
+            if pxy[i,j] != 0:
+                MI += pxy[i,j] * math.log2(pxy[i,j]/(px[i]*py[j]))
+    if MI > 0:
+        return MI
+    else:
+        return 0            
 
-from numpy  import array, shape, where, in1d
-import math
-import time
+def calculate_eeMI(px, py, pxy):
+    return 0 #TODO: calculate expect error MI (number of value != 0 in px, py and pxy)
 
-class InformationTheoryTool:
-    
-    def __init__(self, data):
-        """
-        """
-        # Check if all rows have the same length
-        assert (len(data.shape) == 2)
-        # Save data
-        self.data = data
-        self.n_rows = data.shape[0]
-        self.n_cols = data.shape[1]
-        
-        
-    def single_entropy(self, x_index, log_base, debug = False):
-        """
-        Calculate the entropy of a random variable
-        """
-        # Check if index are into the bounds
-        assert (x_index >= 0 and x_index <= self.n_rows)
-        # Variable to return entropy
-        summation = 0.0
-        # Get uniques values of random variables
-        values_x = set(data[x_index])
-        # Print debug info
-        if debug:
-            print('Entropy of')  
-            print(data[x_index])
-        # For each random
-        for value_x in values_x:
-            px = shape(where(data[x_index]==value_x))[1] / self.n_cols
-            if px > 0.0:
-                summation += px * math.log(px, log_base)
-            if debug:
-                print( '(%d) px:%f' % (value_x, px))
-        if summation == 0.0:
-            return summation
-        else:
-            return - summation
-        
-        
-    def entropy(self, x_index, y_index, log_base, debug = False):
-        """
-        Calculate the entropy between two random variable
-        """
-        assert (x_index >= 0 and x_index <= self.n_rows)
-        assert (y_index >= 0 and y_index <= self.n_rows)
-        # Variable to return MI
-        summation = 0.0
-        # Get uniques values of random variables
-        values_x = set(data[x_index])
-        values_y = set(data[y_index])
-        # Print debug info
-        if debug:
-            print('Entropy between')
-            print(data[x_index])
-            print(data[y_index])
-        # For each random
-        for value_x in values_x:
-            for value_y in values_y:
-                pxy = len(where(in1d(where(data[x_index]==value_x)[0], 
-                                where(data[y_index]==value_y)[0])==True)[0]) / self.n_cols
-                if pxy > 0.0:
-                    summation += pxy * math.log(pxy, log_base)
-                if debug:
-                    print( '(%d,%d) pxy:%f' % (value_x, value_y, pxy))
-        if summation == 0.0:
-            return summation
-        else:
-            return - summation
-        
-        
-        
-    def mutual_information(self, x_index, y_index, log_base, debug = False):
-        """
-        Calculate and return Mutual information between two random variables
-        """
-        # Check if index are into the bounds
-        assert (x_index >= 0 and x_index <= self.n_rows)
-        assert (y_index >= 0 and y_index <= self.n_rows)
-        # Variable to return MI
-        summation = 0.0
-        # Get uniques values of random variables
-        values_x = set(data[x_index])
-        values_y = set(data[y_index])
-        # Print debug info
-        if debug:
-            print( 'MI between')
-            print(data[x_index])
-            print(data[y_index])
-        # For each random
-        for value_x in values_x:
-            for value_y in values_y:
-                px = shape(where(data[x_index]==value_x))[1] / self.n_cols
-                py = shape(where(data[y_index]==value_y))[1] / self.n_cols
-                pxy = len(where(in1d(where(data[x_index]==value_x)[0], 
-                                where(data[y_index]==value_y)[0])==True)[0]) / self.n_cols
-                if pxy > 0.0:
-                    summation += pxy * math.log((pxy / (px*py)), log_base)
-                if debug:
-                    print('(%d,%d) px:%f py:%f pxy:%f' % (value_x, value_y, px, py, pxy))
-        return summation
-
-#TODO: write a code for calculate the expected error -> B(x,y) - Bx - By +1 / 2N where to B(x,y), Bx and By are the count of non zero in the variable x,y x&y ; and N the sample size
+#TODO: make calculate of joint entropy : pxy[i,j] * log2(pxy[i,j])
