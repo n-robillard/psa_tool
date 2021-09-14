@@ -171,4 +171,3 @@ dependencies:
     - mmtf-python==1.1.2
     - networkx==2.6.3
     - pbxplore==1.4.0
-prefix: /home/nicolasrobillard/.conda/envs/GSA2PB_env
