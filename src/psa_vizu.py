@@ -1,3 +1,11 @@
+"""
+Program for help the graphic vizualisation in psa_tool
+
+=====================================================================
+
+Produce an heatmap for the vizualisation of the normalized mutual information
+"""
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -16,3 +24,4 @@ def matrix_plot(matrix):
     sns.set_style({'xtick.bottom': True}, {'ytick.left': True})
     return heatmap
 
+#TODO: other vizualisation of different criteria (entropy, frames, etc.)
