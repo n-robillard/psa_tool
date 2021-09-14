@@ -6,7 +6,7 @@ Main program of "psa_tool"
 Author : Robillard Nicolas, nicolas.robillard@ymail.com
 
 In this program, we have the implementation of the calcul of trajectories by 
-PBxplore and the statistic analyze provide by GSA-tools (#FIXME:refs). This 
+PBxplore and the statistic analyze provide by GSA-tools (Pandini et al, FACEBS J., 2012). This 
 program need the specific environnment provide in /src/psa_tool_env.yml in 
 the reprository on GitHub
 
@@ -25,12 +25,12 @@ import numpy as np
 dir_name = ""
 while dir_name == "":
     temp = input("Name of the directory where sample are stored in \"data\" : ")
-    if os.path.exists("../data/"+dir_name):
+    if os.path.exists("./data/"+dir_name):
         dir_name = temp
     else:
         print("Directory doesn't exist !")
 
-files = os.listdir("../data/"+dir_name)
+files = os.listdir("./data/"+dir_name)
 pos = files[0].rfind("_") + 1
 file_row = files[0][:pos]
 start = int(input("Please enter the time where the analyse start : "))
@@ -41,7 +41,7 @@ step = int(input("Please, enter the time between every steps : "))
 current = start
 while current <= end:
     file_name = file_row + str(current) + ".pdb"
-    copyfile("../data/"+ dir_name +"/"+ file_name, "../data/temp/" + file_name)
+    copyfile("../data/"+ dir_name +"/"+ file_name, "./data/temp/" + file_name)
     current += step
 
 # use of PBassign from PBxplore for the calcul of trajectories and his assign
@@ -53,7 +53,7 @@ fasta_pbs = fasta.get_transpose()
 
 #statistic analyze of the mutual information (mi), the expected error (eemi),
 # the joint entropy and the normalized mutual information (normalized_mi)
-mi, eemi, joint_entropy, normalized_MI = pb.stats_analyze(fasta_pbs)
+mi, eemi, joint_entropy, normalized_MI = psaa.stats_analyze(fasta_pbs)
 
 #vizualisation of the normalized mutual information
 vizu_nmi = psav.matrix_plot(normalized_MI,np.min(normalized_MI),np.max(normalized_MI))
