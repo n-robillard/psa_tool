@@ -15,13 +15,14 @@ def matrix_plot(matrix):
                       square=True,
                       linewidths = .5,
                       cmap ='Blues',
-                      cbar_kws={"shrink": .4, 'ticks' : [-0.5, -0.625, -0.25, -0.125, 0.0]},
-                      vmin = -0.5, 
-                      vmax = 0.0,
+                      cbar_kws={"shrink": .4, 'ticks' : [-0.2, -0.1, 0.0, 0.1, 0.2]},
+                      vmin = -0.2, 
+                      vmax = 0.2,
                       )
-    ax.set_yticklabels(matrix[i], rotation = 0)
-    ax.set_xticklabels(matrix[i])
     sns.set_style({'xtick.bottom': True}, {'ytick.left': True})
+    plt.title("Normalized Mutual Information")
+    plt.xlabel("Fragment number")
+    plt.ylabel("Fragment number")
     return heatmap
 
 #TODO: other vizualisation of different criteria (entropy, frames, etc.)
