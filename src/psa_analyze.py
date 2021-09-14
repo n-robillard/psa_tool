@@ -121,7 +121,7 @@ def calculate_joint_entropy(pxy):
     for i in range(0,size):
         for j in range(0,size):
             if pxy [i,j] !=0:
-                joint_entropy += pxy[i,j] * math.log2(pxy[i,j])
+                joint_entropy -= pxy[i,j] * math.log2(pxy[i,j])
     if joint_entropy > 0: #exclude the division by 0
         return joint_entropy
     else:
